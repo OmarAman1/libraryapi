@@ -1,29 +1,39 @@
-package service;
+package org.example.libraryapi.service;
 
-
-import dto.BookRequestDto;
-import dto.BookResponseDto;
-import dto.BookV2ResponseDto;
-import exception.BookNotFoundException;
-import model.Book;
+import org.example.libraryapi.dto.BookRequestDto;
+import org.example.libraryapi.dto.BookResponseDto;
+import org.example.libraryapi.dto.BookV2ResponseDto;
+import org.example.libraryapi.exception.AuthorNotFoundException;
+import org.example.libraryapi.exception.BookNotFoundException;
+import org.example.libraryapi.model.Author;
+import org.example.libraryapi.model.Book;
+import org.example.libraryapi.repository.AuthorRepository;
+import org.example.libraryapi.repository.BookRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import repository.BookRepository;
-
-import java.util.List;
 
 @Service
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
 
-    public BookService(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository, AuthorRepository authorRepository) {
         this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
     }
 
+    @CacheEvict(value = "books", allEntries = true)
     public BookResponseDto createBook(BookRequestDto requestDto) {
+        Author author = authorRepository.findById(requestDto.getAuthorId())
+                .orElseThrow(() -> new AuthorNotFoundException(requestDto.getAuthorId()));
+
         Book book = new Book();
         book.setTitle(requestDto.getTitle());
-        book.setAuthor(requestDto.getAuthor());
+        book.setAuthor(author);
         book.setIsbn(requestDto.getIsbn());
         book.setPublishedYear(requestDto.getPublishedYear());
 
@@ -32,13 +42,12 @@ public class BookService {
         return mapToResponseDto(savedBook);
     }
 
-    public List<BookResponseDto> getAllBooks() {
-        return bookRepository.findAll()
-                .stream()
-                .map(this::mapToResponseDto)
-                .toList();
+    public Page<BookResponseDto> getAllBooks(Pageable pageable) {
+        return bookRepository.findAll(pageable)
+                .map(this::mapToResponseDto);
     }
 
+    @Cacheable(value = "books", key = "#id")
     public BookResponseDto getBookById(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
@@ -46,18 +55,17 @@ public class BookService {
         return mapToResponseDto(book);
     }
 
-    public List<BookV2ResponseDto> getAllBooksV2() {
-        return bookRepository.findAll()
-                .stream()
-                .map(this::mapToV2ResponseDto)
-                .toList();
+    public Page<BookV2ResponseDto> getAllBooksV2(Pageable pageable) {
+        return bookRepository.findAll(pageable)
+                .map(this::mapToV2ResponseDto);
     }
 
     private BookResponseDto mapToResponseDto(Book book) {
         return new BookResponseDto(
                 book.getId(),
                 book.getTitle(),
-                book.getAuthor(),
+                book.getAuthor() != null ? book.getAuthor().getName() : null,
+                book.getAuthor() != null ? book.getAuthor().getId() : null,
                 book.getIsbn(),
                 book.getPublishedYear()
         );
@@ -67,7 +75,7 @@ public class BookService {
         return new BookV2ResponseDto(
                 book.getId(),
                 book.getTitle(),
-                book.getAuthor(),
+                book.getAuthor() != null ? book.getAuthor().getName() : null,
                 book.getIsbn(),
                 book.getPublishedYear(),
                 true
