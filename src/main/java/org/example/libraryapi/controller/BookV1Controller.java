@@ -1,15 +1,15 @@
-package org.example.libraryapi.controller;
+package controller;
 
+import dto.BookRequestDto;
+import dto.BookResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.example.libraryapi.dto.BookRequestDto;
-import org.example.libraryapi.dto.BookResponseDto;
-import org.example.libraryapi.service.BookService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import service.BookService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/books")
@@ -30,11 +30,11 @@ public class BookV1Controller {
         return bookService.createBook(requestDto);
     }
 
-    @Operation(summary = "Hämta alla böcker i API v1 med pagination")
-    @ApiResponse(responseCode = "200", description = "Sida med böcker")
+    @Operation(summary = "Hämta alla böcker i API v1")
+    @ApiResponse(responseCode = "200", description = "Lista med böcker")
     @GetMapping
-    public Page<BookResponseDto> getAllBooks(Pageable pageable) {
-        return bookService.getAllBooks(pageable);
+    public List<BookResponseDto> getAllBooks() {
+        return bookService.getAllBooks();
     }
 
     @Operation(summary = "Hämta en bok via id i API v1")

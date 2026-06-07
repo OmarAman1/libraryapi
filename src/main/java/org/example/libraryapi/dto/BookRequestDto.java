@@ -1,8 +1,7 @@
-package org.example.libraryapi.dto;
+package dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Request för att skapa en bok")
 public class BookRequestDto {
@@ -11,9 +10,9 @@ public class BookRequestDto {
     @Schema(example = "Harry Potter and the Philosopher's Stone")
     private String title;
 
-    @NotNull(message = "Author id must not be null")
-    @Schema(example = "1")
-    private Long authorId;
+    @NotBlank(message = "Author must not be blank")
+    @Schema(example = "J.K. Rowling")
+    private String author;
 
     @Schema(example = "9780747532743")
     private String isbn;
@@ -28,28 +27,28 @@ public class BookRequestDto {
         return title;
     }
 
-    public Long getAuthorId() {
-        return authorId;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getIsbn() {
         return isbn;
     }
 
-    public int getPublishedYear() {
-        return publishedYear;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setAuthorId(Long authorId) {
-        this.authorId = authorId;
-    }
-
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    public int getPublishedYear() {
+        return publishedYear;
     }
 
     public void setPublishedYear(int publishedYear) {

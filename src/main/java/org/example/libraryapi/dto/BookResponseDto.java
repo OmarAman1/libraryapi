@@ -1,31 +1,32 @@
-package org.example.libraryapi.dto;
+package dto;
 
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-public class BookResponseDto implements Serializable {
+@Schema(description = "Response för en bok i API v1")
+public class BookResponseDto {
 
+    @Schema(example = "1")
     private Long id;
+
+    @Schema(example = "Harry Potter and the Philosopher's Stone")
     private String title;
-    private String authorName;
-    private Long authorId;
+
+    @Schema(example = "J.K. Rowling")
+    private String author;
+
+    @Schema(example = "9780747532743")
     private String isbn;
+
+    @Schema(example = "1997")
     private int publishedYear;
 
     public BookResponseDto() {
     }
 
-    public BookResponseDto(
-            Long id,
-            String title,
-            String authorName,
-            Long authorId,
-            String isbn,
-            int publishedYear
-    ) {
+    public BookResponseDto(Long id, String title, String author, String isbn, int publishedYear) {
         this.id = id;
         this.title = title;
-        this.authorName = authorName;
-        this.authorId = authorId;
+        this.author = author;
         this.isbn = isbn;
         this.publishedYear = publishedYear;
     }
@@ -46,20 +47,12 @@ public class BookResponseDto implements Serializable {
         this.title = title;
     }
 
-    public String getAuthorName() {
-        return authorName;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
-    }
-
-    public Long getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(Long authorId) {
-        this.authorId = authorId;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getIsbn() {

@@ -1,12 +1,12 @@
-package org.example.libraryapi.controller;
+package controller;
 
+import dto.BookV2WrapperResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
-import org.example.libraryapi.dto.BookV2ResponseDto;
-import org.example.libraryapi.dto.BookV2WrapperResponseDto;
-import org.example.libraryapi.service.BookService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import service.BookService;
 
 @RestController
 @RequestMapping("/api/v2/books")
@@ -18,11 +18,10 @@ public class BookV2Controller {
         this.bookService = bookService;
     }
 
-    @Operation(summary = "Hämta alla böcker i API v2 med pagination")
+    @Operation(summary = "Hämta alla böcker i API v2")
+    @ApiResponse(responseCode = "200", description = "Lista med böcker i wrapper-format")
     @GetMapping
-    public BookV2WrapperResponseDto getAllBooks(Pageable pageable) {
-        Page<BookV2ResponseDto> books = bookService.getAllBooksV2(pageable);
-
-        return new BookV2WrapperResponseDto(books, "v2");
+    public BookV2WrapperResponseDto getAllBooksV2() {
+        return new BookV2WrapperResponseDto(bookService.getAllBooksV2(), "v2");
     }
 }
